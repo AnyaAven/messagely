@@ -8,7 +8,7 @@ import User from "../models/user.js";
 import { SECRET_KEY } from "../config.js";
 
 /** POST /login: {username, password} => {token} */
-router.post("/login", async (req, res) => {
+router.post("/login", async function (req, res){
   if (req.body === undefined) throw new BadRequestError();
 
   const { username, password } = req.body;
@@ -29,7 +29,7 @@ router.post("/login", async (req, res) => {
  * {username, password, first_name, last_name, phone} => {token}.
  */
 
-router.post("/register", async (req, res) => {
+router.post("/register", async function (req, res){
   if (req.body === undefined) throw new BadRequestError();
 
   let user;
