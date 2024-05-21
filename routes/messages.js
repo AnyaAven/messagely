@@ -8,6 +8,10 @@ import User from "../models/user";
 import Message from "../models/message";
 import { UnauthorizedError, BadRequestError } from "../expressError";
 
+//FIXME: test each route.
+
+router.use(ensureLoggedIn);
+
 /** GET /:id - get detail of message.
  *
  * => {message: {id,
@@ -21,11 +25,9 @@ import { UnauthorizedError, BadRequestError } from "../expressError";
  *
  **/
 
-router.use(ensureLoggedIn);
-
 router.get(
   "/:id",
-  async (req, res) => {
+  async function (req, res){
     const username = res.locals.user.username;
     const msg = await Message.get(req.params.id);
 
@@ -44,7 +46,7 @@ router.get(
  *
  **/
 router.post("/",
-  async (req, res) => {
+  async function (req, res){
     if (req.body === undefined) throw new BadRequestError();
     const currentUsername = res.locals.user.username;
     const msgRecipient = req.body.to_username;
@@ -67,13 +69,14 @@ router.post("/",
  *
  **/
 router.post("/:id/read",
-  async (req, res) => {
+  async function (req, res) {
     if (req.body === undefined) throw new BadRequestError();
 
     const currUsername = res.locals.user.username;
     const msgId = req.params.id;
     const msg = await Message.get(msgId);
 
+    //TODO: Update message to be more clear
     if(currUsername !== msg.to_user) throw new UnauthorizedError("Not your msg")
 
     const msgReadAtAndId = await Message.markRead(msgId);
