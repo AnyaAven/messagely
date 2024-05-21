@@ -92,7 +92,7 @@ class User {
       [username],
     );
     const user = results.rows[0];
-    if (!user) return NotFoundError();
+    if (!user) return NotFoundError(); //TODO: Add help infos to not found
 
     return user;
   }
@@ -106,6 +106,10 @@ class User {
    */
 
   static async messagesFrom(username) {
+    // Having no messages is not an error,
+    // not passing in a valid user is.
+    await User.get(username)
+
     const results = await db.query(
       `SELECT
               m.id,
@@ -122,8 +126,6 @@ class User {
        ORDER BY m.sent_at`,
       [username],
     );
-
-    if (results.rows[0] === undefined) return NotFoundError();
 
     return results.rows.map(r =>
       ({
@@ -151,6 +153,10 @@ class User {
    */
 
   static async messagesTo(username) {
+    // Having no messages is not an error,
+    // not passing in a valid user is.
+    await User.get(username)
+
     const results = await db.query(
       `SELECT
               m.id,
@@ -167,8 +173,6 @@ class User {
        ORDER BY sent_at`,
       [username],
     );
-
-    if (results.rows[0] === undefined) return NotFoundError();
 
     return results.rows.map(r =>
       ({
