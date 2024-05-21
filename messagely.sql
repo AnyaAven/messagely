@@ -16,14 +16,15 @@ CREATE TABLE messages (
   read_at TIMESTAMP WITH TIME ZONE);
 
 INSERT INTO users (username, password, first_name, last_name, phone)
-VALUES ("username1", "password1", "fuser1", "luser1", 123-123-1111),
-      ("username2", "password2", "fuser2", "luser2", 123-123-2222),
-      ("username3", "password3", "fuser3", "luser3", 123-123-3333);
+VALUES ('username1', 'password1', 'fuser1', 'luser1', 1231231111),
+       ('username2', 'password2', 'fuser2', 'luser2', 123123222),
+       ('username3', 'password3', 'fuser3', 'luser3', 123123333);
+
+
 
 INSERT INTO messages (from_username, to_username, body)
-VALUES ("username1", "username2", "Hello this is my first message"),
-      ("username1", "username2", "Hello this is my second message"),
-      ("username1", "username2", "Hello this is my third message"),
-      ("username2", "username1", "This is user2's reply message");
+VALUES ('username1', 'username2', '1st msg from u1 to u2'),
+      ('username1', 'username2', '2nd msg from u1 to u2'),
+      ('username2', 'username1', '1st msg from u2 to u1');
 
 
