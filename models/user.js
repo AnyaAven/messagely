@@ -46,11 +46,11 @@ class User {
 
   static async updateLoginTimestamp(username) {
     const results = await db.query(
-    `UPDATE users
+      `UPDATE users
         SET last_login_at=CURRENT_TIMESTAMP
       WHERE username = $1
       RETURNING username
-    `, [username])
+    `, [username]);
 
     const user = results.rows[0];
     if (user === undefined) return NotFoundError();
@@ -117,15 +117,15 @@ class User {
               u.last_name,
               u.phone
        FROM messages AS m
-          JOIN users AS u ON m.from_username = u.username
+          JOIN users AS u ON m.to_username = u.username
        WHERE m.from_username = $1
        ORDER BY m.sent_at`,
       [username],
     );
 
-    if (results.rows[0].length === 0) return NotFoundError();
+    if (results.rows[0] === undefined) return NotFoundError();
 
-    return results.rows.map(r => {
+    return results.rows.map(r =>
       ({
         id: r.id,
         to_user: {
@@ -138,7 +138,7 @@ class User {
         sent_at: r.sent_at,
         read_at: r.read_at,
       })
-    })
+    );
 
   }
 
@@ -162,13 +162,15 @@ class User {
               u.last_name,
               u.phone
        FROM messages AS m
-          JOIN users AS u ON m.to_username = u.username
+          JOIN users AS u ON m.from_username = u.username
        WHERE m.to_username = $1
        ORDER BY sent_at`,
       [username],
     );
 
-    return results.rows.map(r => {
+    if (results.rows[0] === undefined) return NotFoundError();
+
+    return results.rows.map(r =>
       ({
         id: r.id,
         from_user: {
@@ -181,8 +183,7 @@ class User {
         sent_at: r.sent_at,
         read_at: r.read_at,
       })
-    })
-
+    );
   }
 }
 
