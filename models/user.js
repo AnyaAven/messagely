@@ -46,7 +46,7 @@ class User {
 
   static async updateLoginTimestamp(username) {
     const results = await db.query(
-    ` UPDATE users
+    `UPDATE users
         SET last_login_at=CURRENT_TIMESTAMP
       WHERE username = $1
       RETURNING username
@@ -63,7 +63,7 @@ class User {
     const results = await db.query(
       `SELECT username,
               first_name,
-              last_name"
+              last_name
       FROM users
       ORDER BY last_name, first_name`);
 
@@ -82,8 +82,8 @@ class User {
   static async get(username) {
     const results = await db.query(
       `SELECT username,
-                  first_name AS "firstName",
-                  last_name  AS "lastName",
+                  first_name,
+                  last_name,
                   phone,
                   join_at,
                   last_login_at
@@ -110,16 +110,16 @@ class User {
       `SELECT
               m.id,
               m.body,
-              m.sent_at
-              m.read_at
+              m.sent_at,
+              m.read_at,
               u.username,
               u.first_name,
-              u._last_name,
+              u.last_name,
               u.phone
        FROM messages AS m
-          JOIN users AS u ON m.id = u.username
+          JOIN users AS u ON m.from_username = u.username
        WHERE m.from_username = $1
-       ORDER BY sent_at`,
+       ORDER BY m.sent_at`,
       [username],
     );
 
@@ -155,14 +155,14 @@ class User {
       `SELECT
               m.id,
               m.body,
-              m.sent_at
-              m.read_at
+              m.sent_at,
+              m.read_at,
               u.username,
               u.first_name,
-              u._last_name,
+              u.last_name,
               u.phone
        FROM messages AS m
-          JOIN users AS u ON m.id = u.username
+          JOIN users AS u ON m.to_username = u.username
        WHERE m.to_username = $1
        ORDER BY sent_at`,
       [username],
