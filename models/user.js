@@ -45,6 +45,7 @@ class User {
   /** Update last_login_at for user */
 
   static async updateLoginTimestamp(username) {
+    //TODO: use Date obj?
   }
 
   /** All: basic info on all users:
