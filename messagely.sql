@@ -14,3 +14,16 @@ CREATE TABLE messages (
   body TEXT NOT NULL,
   sent_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   read_at TIMESTAMP WITH TIME ZONE);
+
+INSERT INTO users (username, password, first_name, last_name, phone)
+VALUES ("username1", "password1", "fuser1", "luser1", 123-123-1111),
+      ("username2", "password2", "fuser2", "luser2", 123-123-2222),
+      ("username3", "password3", "fuser3", "luser3", 123-123-3333);
+
+INSERT INTO messages (from_username, to_username, body)
+VALUES ("username1", "username2", "Hello this is my first message"),
+      ("username1", "username2", "Hello this is my second message"),
+      ("username1", "username2", "Hello this is my third message"),
+      ("username2", "username1", "This is user2's reply message");
+
+
