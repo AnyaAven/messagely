@@ -51,6 +51,8 @@ class User {
 
       WHERE username = $1
     `, [username])
+
+    if (results.rows[0].length === 0) return NotFoundError;
   }
 
   /** All: basic info on all users:
