@@ -53,7 +53,7 @@ class User {
     `, [username]);
 
     const user = results.rows[0];
-    if (user === undefined) return NotFoundError();
+    if (user === undefined) throw new NotFoundError();
   }
 
   /** All: basic info on all users:
@@ -92,7 +92,7 @@ class User {
       [username],
     );
     const user = results.rows[0];
-    if (!user) return NotFoundError(); //TODO: Add help infos to not found
+    if (!user) throw new NotFoundError(`User not found: ${username}`);
 
     return user;
   }
