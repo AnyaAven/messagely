@@ -50,6 +50,7 @@ class User {
         SET last_login_at=CURRENT_TIMESTAMP,
 
       WHERE username = $1
+      RETURNING last_login_at
     `, [username])
 
     if (results.rows[0].length === 0) return NotFoundError();
