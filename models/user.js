@@ -13,7 +13,7 @@ class User {
    */
 
   static async register({ username, password, first_name, last_name, phone }) {
-    const hpwd = await bcrypt.hash(password, BCRYPT_WORK_FACTOR)
+    const hpwd = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
     const result = await db.query(
       `INSERT INTO users (username,
@@ -24,7 +24,7 @@ class User {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING username, password, first_name, last_name, phone`,
       [username, hpwd, first_name, last_name, phone]
-    )
+    );
 
     return result.rows[0];
   }
@@ -39,19 +39,32 @@ class User {
       [username]);
     const user = result.rows[0];
 
-    return (user && (await bcrypt.compare(password, user.password) === true))
+    return (user && (await bcrypt.compare(password, user.password) === true));
   }
 
   /** Update last_login_at for user */
 
   static async updateLoginTimestamp(username) {
-    //TODO: use Date obj?
+    const results = db.query(
+    ` UPDATE users
+        SET last_login_at=CURRENT_TIMESTAMP,
+
+      WHERE username = $1
+    `, [username])
   }
 
   /** All: basic info on all users:
    * [{username, first_name, last_name}, ...] */
 
   static async all() {
+    const results = db.query(
+      `SELECT username,
+              first_name AS "firstName",
+              last_name AS "lastName"
+      FROM users
+      ORDER BY  last_name, first_name`);
+
+    return results.rows;
   }
 
   /** Get: get user by username
@@ -64,6 +77,20 @@ class User {
    *          last_login_at } */
 
   static async get(username) {
+    const results = await db.query(
+      `SELECT username,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  join_at,
+                  last_login_at
+           FROM users
+           WHERE username = $1`,
+      [username],
+    );
+    const user = results.rows[0];
+
+    return user;
   }
 
   /** Return messages from this user.
@@ -75,6 +102,38 @@ class User {
    */
 
   static async messagesFrom(username) {
+    const results = await db.query(
+      `SELECT
+              m.id,
+              m.body,
+              m.sent_at
+              m.read_at
+              u.username,
+              u.first_name,
+              u._last_name,
+              u.phone
+       FROM messages AS m
+          JOIN users AS u ON m.id = u.username
+       WHERE m.from_username = $1
+       ORDER BY sent_at`,
+      [username],
+    );
+
+    return results.rows.map(r => {
+      ({
+        id: r.id,
+        to_user: {
+          username: r.username,
+          first_name: r.first_name,
+          last_name: r.last_name,
+          phone: r.phone
+        },
+        body: r.body,
+        sent_at: r.sent_at,
+        read_at: r.read_at,
+      })
+    })
+
   }
 
   /** Return messages to this user.
