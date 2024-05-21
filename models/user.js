@@ -45,27 +45,27 @@ class User {
   /** Update last_login_at for user */
 
   static async updateLoginTimestamp(username) {
-    const results = db.query(
+    const results = await db.query(
     ` UPDATE users
-        SET last_login_at=CURRENT_TIMESTAMP,
-
+        SET last_login_at=CURRENT_TIMESTAMP
       WHERE username = $1
-      RETURNING last_login_at
+      RETURNING username
     `, [username])
 
-    if (results.rows[0].length === 0) return NotFoundError();
+    const user = results.rows[0];
+    if (user === undefined) return NotFoundError();
   }
 
   /** All: basic info on all users:
    * [{username, first_name, last_name}, ...] */
 
   static async all() {
-    const results = db.query(
+    const results = await db.query(
       `SELECT username,
-              first_name AS "firstName",
-              last_name AS "lastName"
+              first_name,
+              last_name"
       FROM users
-      ORDER BY  last_name, first_name`);
+      ORDER BY last_name, first_name`);
 
     return results.rows;
   }
