@@ -1,5 +1,11 @@
 /** User of the site. */
 
+
+import { NotFoundError } from "../expressError.js";
+import db from "../db.js";
+import bcrypt from "bcrypt";
+import { BCRYPT_WORK_FACTOR } from "../config.js";
+
 class User {
 
   /** Register new user. Returns
@@ -7,11 +13,33 @@ class User {
    */
 
   static async register({ username, password, first_name, last_name, phone }) {
+    const hpwd = await bcrypt.hash(password, BCRYPT_WORK_FACTOR)
+
+    const result = await db.query(
+      `INSERT INTO users (username,
+        password,
+        first_name,
+        last_name,
+        phone)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING username, password, first_name, last_name, phone`,
+      [username, hpwd, first_name, last_name, phone]
+    )
+
+    return result.rows[0];
   }
 
   /** Authenticate: is username/password valid? Returns boolean. */
 
   static async authenticate(username, password) {
+    const result = await db.query(
+      `SELECT password
+         FROM users
+         WHERE username = $1`,
+      [username]);
+    const user = result.rows[0];
+
+    return (user && (await bcrypt.compare(password, user.password) === true))
   }
 
   /** Update last_login_at for user */
