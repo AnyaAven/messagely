@@ -2,6 +2,12 @@ import express from "express";
 
 const router = new express.Router();
 
+import { ensureLoggedIn } from "../middleware/auth";
+
+import User from "../models/user";
+import Message from "../models/message";
+import { UnauthorizedError, BadRequestError } from "../expressError";
+
 /** GET /:id - get detail of message.
  *
  * => {message: {id,
@@ -15,6 +21,21 @@ const router = new express.Router();
  *
  **/
 
+router.use(ensureLoggedIn);
+
+router.get(
+  "/:id",
+  async (req, res) => {
+    const username = res.locals.user.username;
+    const msg = await Message.get(req.params.id);
+
+    if (msg.from_user.username === username ||
+      msg.to_user.username === username) {
+      return res.json({ msg });
+    }
+    throw new UnauthorizedError;
+  }
+);
 
 /** POST / - post message.
  *
@@ -22,7 +43,21 @@ const router = new express.Router();
  *   {message: {id, from_username, to_username, body, sent_at}}
  *
  **/
+router.post("/",
+  async (req, res) => {
+    if (req.body === undefined) throw new BadRequestError();
+    const currentUsername = res.locals.user.username;
+    const msgRecipient = req.body.to_username;
+    const msgBody = req.body.body;
 
+    // Will throw a 404 if recipient doesn't exist in the DB
+    await User.get(msgRecipient)
+
+    const msg = await Message.create(currentUsername, msgRecipient, msgBody);
+
+    return res.status(201).json({ msg })
+  }
+);
 
 /** POST/:id/read - mark message as read:
  *
@@ -31,6 +66,20 @@ const router = new express.Router();
  * Makes sure that the only the intended recipient can mark as read.
  *
  **/
+router.post("/:id/read",
+  async (req, res) => {
+    if (req.body === undefined) throw new BadRequestError();
 
+    const currUsername = res.locals.user.username;
+    const msgId = req.params.id;
+    const msg = await Message.get(msgId);
+
+    if(currUsername !== msg.to_user) throw new UnauthorizedError("Not your msg")
+
+    const msgReadAtAndId = await Message.markRead(msgId);
+
+    return res.json({ message:  msgReadAtAndId})
+  }
+);
 
 export default router;
