@@ -52,7 +52,7 @@ class User {
       WHERE username = $1
     `, [username])
 
-    if (results.rows[0].length === 0) return NotFoundError;
+    if (results.rows[0].length === 0) return NotFoundError();
   }
 
   /** All: basic info on all users:
@@ -91,6 +91,7 @@ class User {
       [username],
     );
     const user = results.rows[0];
+    if (!user) return NotFoundError();
 
     return user;
   }
@@ -120,6 +121,8 @@ class User {
        ORDER BY sent_at`,
       [username],
     );
+
+    if (results.rows[0].length === 0) return NotFoundError();
 
     return results.rows.map(r => {
       ({
