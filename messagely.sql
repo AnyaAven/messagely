@@ -15,11 +15,11 @@ CREATE TABLE messages (
   sent_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   read_at TIMESTAMP WITH TIME ZONE);
 
+/* Passwords: password1, password2, password3 */
 INSERT INTO users (username, password, first_name, last_name, phone)
-VALUES ('username1', 'password1', 'fuser1', 'luser1', 1231231111),
-       ('username2', 'password2', 'fuser2', 'luser2', 123123222),
-       ('username3', 'password3', 'fuser3', 'luser3', 123123333);
-
+VALUES ('username1', '$2b$04$k49chsPBrXlnEaol1Duiju7LlSkTL75TLjMUH9ZkKEYrC2sH7lUGW', 'fuser1', 'luser1', 1231231111),
+       ('username2', '$2b$04$qS3Obx4lrSpDvDO45rAdyO9MMxYmHKG5CxdPII2jZ7100DAYUnp4O', 'fuser2', 'luser2', 123123222),
+       ('username3', '$2b$04$3DULBaVZqs1BHgm.gAETou0qJXLMI0ExYxQkVGJXXPgXHdGhAu8b2', 'fuser3', 'luser3', 123123333);
 
 
 INSERT INTO messages (from_username, to_username, body)
